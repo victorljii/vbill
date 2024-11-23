@@ -28,8 +28,6 @@ public class SecurityConfig {
 
     /**
      * 认证管理器.
-     * @param authenticationConfiguration
-     * @return
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)

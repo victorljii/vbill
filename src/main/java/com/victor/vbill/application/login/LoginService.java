@@ -7,5 +7,5 @@ import com.victor.vbill.application.login.vo.LoginOutputVO;
  * 登录服务接口
  */
 public interface LoginService {
-    public LoginOutputVO login(LoginInputVO loginInputVO);
+    LoginOutputVO login(LoginInputVO loginInputVO);
 }
