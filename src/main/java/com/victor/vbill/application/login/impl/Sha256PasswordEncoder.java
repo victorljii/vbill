@@ -2,6 +2,7 @@ package com.victor.vbill.application.login.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -12,6 +13,7 @@ import java.util.Arrays;
  *
  * @date 2024/11/20
  */
+@Service
 @Slf4j
 public class Sha256PasswordEncoder implements PasswordEncoder {
     @Override

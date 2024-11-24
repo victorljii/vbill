@@ -1,12 +1,18 @@
 package com.victor.vbill.application.login.config;
 
 import com.victor.vbill.application.login.impl.Sha256PasswordEncoder;
-import org.springframework.beans.factory.annotation.Configurable;
+import com.victor.vbill.application.login.impl.VbillAuthenticationProvider;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -15,8 +21,9 @@ import org.springframework.security.web.SecurityFilterChain;
  *
  * @date 2024/11/21
  */
-@Configurable
+@Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
     /**
      * 配置密码明文加密
@@ -24,6 +31,11 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new Sha256PasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        return new VbillAuthenticationProvider();
     }
 
     /**
@@ -37,11 +49,21 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-
-        return httpSecurity.authorizeHttpRequests((auth) -> {
-                    auth.requestMatchers("/user/public/.*").permitAll()
+        httpSecurity
+                // 禁用 csrf 防护
+                .csrf(CsrfConfigurer::disable)
+                .sessionManagement(customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(customizer -> {
+                    customizer
+                            // 放行登陆和注册接口
+                            .requestMatchers("/user/login/", "/user/login/register").permitAll()
+                            // 其他接口需要校验
                             .anyRequest().authenticated();
                 })
-                .build();
+                // 禁用缓存
+                .headers(customizer -> customizer.cacheControl(HeadersConfigurer.CacheControlConfig::disable))
+                .authenticationProvider(authenticationProvider());
+
+        return httpSecurity.build();
     }
 }
