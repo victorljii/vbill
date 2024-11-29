@@ -4,8 +4,6 @@ import com.victor.vbill.application.login.LoginService;
 import com.victor.vbill.application.login.utils.JwtUtils;
 import com.victor.vbill.application.login.vo.LoginInputVO;
 import com.victor.vbill.application.login.vo.LoginOutputVO;
-import com.victor.vbill.domain.login.User;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;

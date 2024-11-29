@@ -1,5 +1,6 @@
-package com.victor.vbill.application.login.impl;
+package com.victor.vbill.application.login.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class VbillAuthenticationProvider implements AuthenticationProvider {
     @Autowired
     private UserDetailsService userDetailsService;
@@ -22,9 +24,10 @@ public class VbillAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String username = authentication.getPrincipal().toString();
         String password = authentication.getCredentials().toString();
+        log.info("authenticate for username: {}, #TMP password: {}", username, password);
 
         UserDetails user = userDetailsService.loadUserByUsername(username);
-        if (user == null || passwordEncoder.matches(password, user.getPassword())) {
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             throw new BadCredentialsException("the user does not exist or the password is incorrect");
         }
 

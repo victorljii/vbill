@@ -1,4 +1,4 @@
-package com.victor.vbill.application.login.impl;
+package com.victor.vbill.application.login.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;

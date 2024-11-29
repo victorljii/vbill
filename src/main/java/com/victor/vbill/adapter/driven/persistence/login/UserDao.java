@@ -33,8 +33,8 @@ public class UserDao {
                         .createdBy(rs.getString(3))
                         .updatedDate(rs.getLong(4))
                         .updatedBy(rs.getString(5))
-                        .username(rs.getString(2))
-                        .password(rs.getString(6))
+                        .username(rs.getString(6))
+                        .password(rs.getString(7))
                         .build());
     }
 

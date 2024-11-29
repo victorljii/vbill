@@ -1,7 +1,6 @@
 package com.victor.vbill.application.login.config;
 
-import com.victor.vbill.application.login.impl.Sha256PasswordEncoder;
-import com.victor.vbill.application.login.impl.VbillAuthenticationProvider;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,27 +14,36 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * spring security 配置类
  *
  * @date 2024/11/21
  */
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    public AuthenticationProvider authenticationProvider() {
+        log.info("new a VbillAuthenticationProvider");
+        return new VbillAuthenticationProvider();
+    }
+
+    public VbillAuthenticationTokenFilter vbillAuthenticationTokenFilter() {
+        log.info("new a VbillAuthenticationTokenFilter");
+        return new VbillAuthenticationTokenFilter();
+    }
+
     /**
      * 配置密码明文加密
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
+        log.info("new a Sha256PasswordEncoder");
         return new Sha256PasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        return new VbillAuthenticationProvider();
     }
 
     /**
@@ -44,11 +52,13 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
             throws Exception {
+        log.info("get default AuthenticationManager");
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+        log.info("start filterChain");
         httpSecurity
                 // 禁用 csrf 防护
                 .csrf(CsrfConfigurer::disable)
@@ -62,7 +72,8 @@ public class SecurityConfig {
                 })
                 // 禁用缓存
                 .headers(customizer -> customizer.cacheControl(HeadersConfigurer.CacheControlConfig::disable))
-                .authenticationProvider(authenticationProvider());
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(vbillAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
     }
